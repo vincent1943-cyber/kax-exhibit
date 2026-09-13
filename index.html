@@ -273,6 +273,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .detail[data-layout="gateway"] .cards>.holo-card:nth-last-child(-n+2){grid-column:span 3}
 .detail[data-layout="twin-entry"] .page-title-row{display:block}
 .detail[data-layout="twin-entry"] #pageEn{display:block;margin-top:calc(var(--u)*5)}
+
 </style>
 </head>
 <body>
@@ -323,7 +324,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   </section>
  </div>
  <footer class="footer">
-  <div class="timeline" id="timeline" role="group" aria-label="封面与二十页内容轮播时间线"></div>
+  <div class="timeline" id="timeline" role="group" aria-label="封面与二十一页内容轮播时间线"></div>
   <div class="controls" hidden inert aria-hidden="true">
    <button type="button" class="ctl" id="loopMode">68 秒轮播</button>
    <button type="button" class="ctl" id="demoMode">逐页讲解</button>
@@ -976,10 +977,11 @@ const root=document.getElementById('exhibit'),$=id=>document.getElementById(id);
 const originalScenes=window.__PAGES,ORIGINALS=window.__ORIGINAL_IMAGES;
 const inserts={3:{title:'本体与知识库 · 操作演示',video:'ontology-demo.mp4',duration:20.015011},7:{title:'智能体构建 · 操作演示',video:'agent-build-demo.mp4',duration:26.121995},[originalScenes.length-1]:{title:'数字小和 · 操作演示',video:'xiaohe-demo.mp4',duration:17.483991}};
 const contentScenes=originalScenes.flatMap((s,i)=>{const page={...s,layer:[6,7,8].includes(i)?'stack':s.layer,originalIndex:i,duration:4};const v=inserts[i];return v?[page,{...page,...v,primary:false,focusTitle:s.title,no:'▶',srcLabel:'操作演示',en:'PRODUCT DEMO',sub:'',caption:'',sections:[]}]:[page]});
-// Keep existing relative order; move the overview immediately after the cover.
+// Cover, core problems and value, architecture overview, then the existing content order.
 const overviewIndex=contentScenes.findIndex(s=>!s.video&&s.title==='医疗智能体平台总体架构');
 const overview=contentScenes.splice(overviewIndex,1)[0];
-const scenes=[{cover:true,title:'AI 时代医院新一代智能体架构与业务闭环落地',layer:'all',srcIdx:0,srcLabel:'封面',no:'',en:'',sub:'',caption:'',sections:[],duration:8},overview,...contentScenes];
+const valueOverview={"title": "新架构带来的三大业务价值", "layer": "all", "srcIdx": 0, "synthesized": true, "srcLabel": "材料综合提炼", "no": "", "en": "", "sub": "贯通临床科研全流程 · 数字员工赋能每位员工 · 数字分身沉淀专家思维", "caption": "让每位员工获得专业辅助，让临床科研形成闭环，让专家经验成为可传承的数字资产。", "sections": [{"h": "01 临床科研｜贯通临床问题到研究成果", "kind": "cards", "cols": 3, "items": [{"t": "业务痛点", "d": "病例、文献与研究数据分散，资料整理耗时，临床问题到研究成果的各环节衔接困难。"}, {"t": "新的工作方式", "d": "围绕临床问题，协同完成循证检索、病例摘要、队列筛选、方案设计、分析绘图与论文草拟。"}, {"t": "业务价值", "d": "减少资料搜集与整理负担，贯通临床与科研全流程，让研究证据与成果可追溯。"}]}, {"h": "02 数字员工｜赋能医院每一位员工", "kind": "cards", "cols": 3, "items": [{"t": "业务痛点", "d": "医护、科研、管理与行政人员承担大量重复工作，查数、写材料和跨部门协作占用精力。"}, {"t": "新的工作方式", "d": "每位员工按岗位调用数字专家与助手群，协同完成查数、写作、PPT、流程办理与教学准备。"}, {"t": "业务价值", "d": "把专业辅助能力带到每个岗位，减少重复劳动与材料交接，让员工聚焦专业判断与服务。"}]}, {"h": "03 数字分身｜以思维链形成个人数字孪生", "kind": "cards", "cols": 3, "items": [{"t": "业务痛点", "d": "专家经验依赖个人，决策依据难沉淀，带教与经验传承难以覆盖更多人员和场景。"}, {"t": "新的工作方式", "d": "引入思维链理念，经本人复核提炼决策依据与路径，融合知识、工作习惯与反馈，形成个人数字孪生。"}, {"t": "业务价值", "d": "让专家经验可调用、可带教、可传承，支撑个性化工作辅助，并在实践中持续完善。"}]}], "duration": 12};
+const scenes=[{cover:true,title:'AI 时代医院新一代智能体架构与业务闭环落地',layer:'all',srcIdx:0,srcLabel:'封面',no:'',en:'',sub:'',caption:'',sections:[],duration:8},valueOverview,overview,...contentScenes];
 const LAYER_COLOR={compute:'#3d9bff',semantic:'#2ff5d0',stack:'#6a8cff',employee:'#9d7bff',twin:'#00e8ff',platform:'#9d7bff',all:'#00e8ff'};
 const architectureFocus={all:['整体架构','顶部双模块并列，下方三层技术底座。'],platform:['数字员工平台','数字员工与数字分身并列协同。'],employee:['数字员工层','任务分工、多员工协作与结果交接。'],twin:['数字分身层','岗位身份、知识范围与授权边界。'],stack:['智能体开发技术栈','知识、开发、监控与 Skill Hub。'],semantic:['数据语义层','动态本体、联邦执行与受控数据包。'],compute:['算力调度层','本异地资源、虚拟 GPU 与调度优化。']};
 const layerTargets=Object.fromEntries(['employee','twin','stack','semantic','compute'].map(layer=>{const p=scenes.findIndex(s=>s.layer===layer&&s.primary);return[layer,p>=0?p:scenes.findIndex(s=>s.layer===layer)]}));
@@ -1106,7 +1108,7 @@ function render(){const s=scenes[index];
   const f=architectureFocus[s.layer];$('archCurrentTitle').textContent=f[0];$('archCurrentDescription').textContent='当前内容：'+(s.focusTitle||s.title);arch3D?.setFocus(s.layer,s.srcIdx);
   const w=$('wipe');w.classList.remove('go');void w.offsetWidth;w.classList.add('go');
  }
- if($('sourceDialog').open){if(s.video||s.cover)$('sourceDialog').close();else renderDialog();}
+ if($('sourceDialog').open){if(s.video||s.cover||s.synthesized)$('sourceDialog').close();else renderDialog();}
  fitPageContent();syncMedia();updateStateControls();updateProgress();
 }
 function step(d){index=mode==='loop'?(index+d+N)%N:Math.max(0,Math.min(N-1,index+d));elapsed=0;renderedIndex=-1;last=performance.now();render();}
@@ -1118,7 +1120,7 @@ $('timeline').onclick=e=>{const seg=e.target.closest('[data-page]');if(seg)selec
 $('timeline').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){const seg=e.target.closest('[data-page]');if(seg){e.preventDefault();e.stopPropagation();selectPage(+seg.dataset.page);}}};
 $('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);$('play').onclick=togglePlay;
 function renderDialog(){const s=scenes[index];$('dialogTitle').textContent=`${index} / ${N-1} · ${s.title}`;$('zoomedSlide').src=ORIGINALS[s.originalIndex];$('zoomedSlide').alt=s.title;$('dialogPrev').disabled=index===0;$('dialogNext').disabled=index===N-1;}
-function enlarge(){if(scenes[index].video||scenes[index].cover)return;playing=false;mode='manual';render();$('sourceDialog').showModal();renderDialog();$('sourceZoom').value=100;setZoom();updateSpinControls();}
+function enlarge(){if(scenes[index].video||scenes[index].cover||scenes[index].synthesized)return;playing=false;mode='manual';render();$('sourceDialog').showModal();renderDialog();$('sourceZoom').value=100;setZoom();updateSpinControls();}
 function setZoom(){const n=+$('sourceZoom').value;$('zoomedSlide').style.width=n+'%';$('zoomValue').textContent=n+'%';}
 $('enlargeSource').onclick=enlarge;$('dialogClose').onclick=()=>$('sourceDialog').close();$('sourceZoom').oninput=setZoom;$('dialogPrev').onclick=()=>step(-1);$('dialogNext').onclick=()=>step(1);$('sourceDialog').addEventListener('close',()=>{last=performance.now();});
 async function full(toggle=false){try{if(document.fullscreenElement){if(toggle)await document.exitFullscreen();}else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else throw Error('Fullscreen unsupported');}catch(e){$('fullscreenEntry').hidden=false;}}
