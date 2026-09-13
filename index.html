@@ -312,7 +312,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   </aside>
   <section class="detail" aria-label="讲解内容">
    <div class="page-head">
-    <div class="page-eyebrow"><span class="kc">KINGSOFT CLOUD · HEALTHCARE AI</span><span id="page" class="page-no">01 / 17</span><span id="srcPageNo" class="page-no" style="opacity:.65">原稿 P.08</span></div>
+    <div class="page-eyebrow"><span class="kc">KINGSOFT CLOUD · HEALTHCARE AI</span></div>
     <div class="page-title-row"><h1 id="pageTitle">—</h1><span id="pageEn"></span></div>
     <p id="pageSub">—</p>
     <span class="ghost" id="ghostNo" aria-hidden="true">09</span>
@@ -1100,7 +1100,7 @@ function render(){const s=scenes[index];
   root.style.setProperty('--accent',LAYER_COLOR[s.layer]||'#00e8ff');root.querySelector('.detail').classList.toggle('video-scene',!!s.video);
   $('pageTitle').innerHTML=[...s.title].map((c,i)=>`<span class="ch" style="animation-delay:${i*38}ms">${esc(c)}</span>`).join('');
   $('pageEn').textContent=s.en||'';$('pageSub').textContent=s.sub;
-  $('page').textContent=`${s.cover?'封面':String(index).padStart(2,'0')} / ${N-1}`;$('srcPageNo').textContent=s.srcLabel||`原稿 P.${String(s.srcPage).padStart(2,'0')}`;$('ghostNo').textContent=s.no;
+  $('ghostNo').textContent=s.no;
   if(s.video)mountVideo(s);else $('pageBody').innerHTML=s.sections.map((sec,i)=>renderSection(sec,i)).join('');
   $('caption').textContent=s.caption;
   const f=architectureFocus[s.layer];$('archCurrentTitle').textContent=f[0];$('archCurrentDescription').textContent='当前内容：'+(s.focusTitle||s.title);arch3D?.setFocus(s.layer,s.srcIdx);
