@@ -254,11 +254,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .fullscreen-entry{position:fixed;right:24px;bottom:48px;z-index:100}
 .tl-seg.is-video .n{color:#2ff5d0}
 
+
+/* Opening cover: preserve its full composition and keep navigation available. */
+.exhibit-cover{position:absolute;inset:0 0 calc(var(--u)*46);z-index:45;display:flex;align-items:center;justify-content:center;background:#020916}
+.exhibit-cover[hidden]{display:none}
+.exhibit-cover img{display:block;width:100%;height:100%;object-fit:contain}
+.cover-scene .masthead,.cover-scene .main{visibility:hidden;pointer-events:none}
+.cover-scene .footer{z-index:46}
 </style>
 </head>
 <body>
 <div id="stageWrap">
-<div id="exhibit">
+<div id="exhibit" class="cover-scene">
+<div id="exhibitCover" class="exhibit-cover" aria-label="合作项目封面"><img src="cover.png" fetchpriority="high" alt="金山云与武汉协和医院联合合作项目展示：AI 时代医院新一代智能体架构与业务闭环落地"></div>
 <canvas id="bgCanvas" aria-hidden="true"></canvas>
 <div id="wipe"></div>
 <section class="screen" aria-label="北京金山云展台演示屏幕 V2">
@@ -303,7 +311,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   </section>
  </div>
  <footer class="footer">
-  <div class="timeline" id="timeline" role="group" aria-label="二十幕轮播时间线"></div>
+  <div class="timeline" id="timeline" role="group" aria-label="封面与二十页内容轮播时间线"></div>
   <div class="controls" hidden inert aria-hidden="true">
    <button type="button" class="ctl" id="loopMode">68 秒轮播</button>
    <button type="button" class="ctl" id="demoMode">逐页讲解</button>
@@ -955,7 +963,11 @@ return{setFocus,running,toggle(){st.enabled=!st.enabled;if(st.enabled)st.preview
 const root=document.getElementById('exhibit'),$=id=>document.getElementById(id);
 const originalScenes=window.__PAGES,ORIGINALS=window.__ORIGINAL_IMAGES;
 const inserts={3:{title:'本体与知识库 · 操作演示',video:'ontology-demo.mp4',duration:20.015011},7:{title:'智能体构建 · 操作演示',video:'agent-build-demo.mp4',duration:26.121995},[originalScenes.length-1]:{title:'数字小和 · 操作演示',video:'xiaohe-demo.mp4',duration:17.483991}};
-const scenes=originalScenes.flatMap((s,i)=>{const page={...s,layer:[6,7,8].includes(i)?'stack':s.layer,originalIndex:i,duration:4};const v=inserts[i];return v?[page,{...page,...v,primary:false,focusTitle:s.title,no:'▶',srcLabel:'操作演示',en:'PRODUCT DEMO',sub:'',caption:'',sections:[]}]:[page]});
+const contentScenes=originalScenes.flatMap((s,i)=>{const page={...s,layer:[6,7,8].includes(i)?'stack':s.layer,originalIndex:i,duration:4};const v=inserts[i];return v?[page,{...page,...v,primary:false,focusTitle:s.title,no:'▶',srcLabel:'操作演示',en:'PRODUCT DEMO',sub:'',caption:'',sections:[]}]:[page]});
+// Keep existing relative order; move the overview immediately after the cover.
+const overviewIndex=contentScenes.findIndex(s=>!s.video&&s.title==='医疗智能体平台总体架构');
+const overview=contentScenes.splice(overviewIndex,1)[0];
+const scenes=[{cover:true,title:'AI 时代医院新一代智能体架构与业务闭环落地',layer:'all',srcIdx:0,srcLabel:'封面',no:'',en:'',sub:'',caption:'',sections:[],duration:8},overview,...contentScenes];
 const LAYER_COLOR={compute:'#3d9bff',semantic:'#2ff5d0',stack:'#6a8cff',employee:'#9d7bff',twin:'#00e8ff',platform:'#9d7bff',all:'#00e8ff'};
 const architectureFocus={all:['整体架构','顶部双模块并列，下方三层技术底座。'],platform:['数字员工平台','数字员工与数字分身并列协同。'],employee:['数字员工层','任务分工、多员工协作与结果交接。'],twin:['数字分身层','岗位身份、知识范围与授权边界。'],stack:['智能体开发技术栈','知识、开发、监控与 Skill Hub。'],semantic:['数据语义层','动态本体、联邦执行与受控数据包。'],compute:['算力调度层','本异地资源、虚拟 GPU 与调度优化。']};
 const layerTargets=Object.fromEntries(['employee','twin','stack','semantic','compute'].map(layer=>{const p=scenes.findIndex(s=>s.layer===layer&&s.primary);return[layer,p>=0?p:scenes.findIndex(s=>s.layer===layer)]}));
@@ -1016,8 +1028,8 @@ const N=scenes.length;
 const total=()=>scenes.reduce((n,s)=>n+s.duration,0);
 const offset=i=>scenes.slice(0,i).reduce((n,s)=>n+s.duration,0);
 const clock=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
-$('timeline').innerHTML=scenes.map((s,i)=>`<div class="tl-seg${s.video?' is-video':''}" data-page="${i}" role="button" tabindex="0" aria-label="第 ${i+1} 幕：${esc(s.title)}"><span class="fill"></span><span class="n">${String(i+1).padStart(2,'0')}${s.video?' ▷':''}</span></div>`).join('');
-$('sourcePages').innerHTML=scenes.map((s,i)=>`<button type="button" data-page="${i}">${i+1}</button>`).join('');
+$('timeline').innerHTML=scenes.map((s,i)=>`<div class="tl-seg${s.video?' is-video':''}" data-page="${i}" role="button" tabindex="0" aria-label="${s.cover?'封面':'第 '+i+' 页'}：${esc(s.title)}"><span class="fill"></span><span class="n">${s.cover?'封面':String(i).padStart(2,'0')}${s.video?' ▷':''}</span></div>`).join('');
+$('sourcePages').innerHTML=scenes.map((s,i)=>`<button type="button" data-page="${i}">${s.cover?'封面':i}</button>`).join('');
 const tlSegs=[...$('timeline').children];
 function updateSpinControls(){const stt=arch3D?.state();$('archSpinToggle').disabled=!stt?.ready;$('archResetView').disabled=!stt?.ready;$('archSpinToggle').textContent=stt?.enabled?'暂停自转':'开启自转';$('archSpinToggle').setAttribute('aria-pressed',String(!!stt?.enabled));$('archSpinStatus').textContent=stt?.ready?(stt.running?'持续自转 · 可拖动调整视角':stt.enabled?'调整视角中 · 松开后继续自转':'自转已暂停 · 点击开启自转恢复'):'当前为静态预览，刷新页面可重试';}
 function selectPage(i){index=Math.max(0,Math.min(N-1,i));mode='loop';playing=true;elapsed=0;renderedIndex=-1;last=performance.now();render();}
@@ -1052,18 +1064,19 @@ function updateStateControls(){
  updateSpinControls();
 }
 function render(){const s=scenes[index];
+ root.classList.toggle('cover-scene',!!s.cover);$('exhibitCover').hidden=!s.cover;
  if(renderedIndex!==index){
   if(video){video.pause();video.removeAttribute('src');video.load();video=null;}playPending=false;renderedIndex=index;
   root.style.setProperty('--accent',LAYER_COLOR[s.layer]||'#00e8ff');root.querySelector('.detail').classList.toggle('video-scene',!!s.video);
   $('pageTitle').innerHTML=[...s.title].map((c,i)=>`<span class="ch" style="animation-delay:${i*38}ms">${esc(c)}</span>`).join('');
   $('pageEn').textContent=s.en||'';$('pageSub').textContent=s.sub;
-  $('page').textContent=`${String(index+1).padStart(2,'0')} / ${N}`;$('srcPageNo').textContent=s.srcLabel||`原稿 P.${String(s.srcPage).padStart(2,'0')}`;$('ghostNo').textContent=s.no;
+  $('page').textContent=`${s.cover?'封面':String(index).padStart(2,'0')} / ${N-1}`;$('srcPageNo').textContent=s.srcLabel||`原稿 P.${String(s.srcPage).padStart(2,'0')}`;$('ghostNo').textContent=s.no;
   if(s.video)mountVideo(s);else $('pageBody').innerHTML=s.sections.map((sec,i)=>renderSection(sec,i)).join('');
   $('caption').textContent=s.caption;
   const f=architectureFocus[s.layer];$('archCurrentTitle').textContent=f[0];$('archCurrentDescription').textContent='当前内容：'+(s.focusTitle||s.title);arch3D?.setFocus(s.layer,s.srcIdx);
   const w=$('wipe');w.classList.remove('go');void w.offsetWidth;w.classList.add('go');
  }
- if($('sourceDialog').open){if(s.video)$('sourceDialog').close();else renderDialog();}
+ if($('sourceDialog').open){if(s.video||s.cover)$('sourceDialog').close();else renderDialog();}
  syncMedia();updateStateControls();updateProgress();
 }
 function step(d){index=mode==='loop'?(index+d+N)%N:Math.max(0,Math.min(N-1,index+d));elapsed=0;renderedIndex=-1;last=performance.now();render();}
@@ -1074,8 +1087,8 @@ $('sourcePages').onclick=e=>{const b=e.target.closest('[data-page]');if(b)select
 $('timeline').onclick=e=>{const seg=e.target.closest('[data-page]');if(seg)selectPage(+seg.dataset.page);};
 $('timeline').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){const seg=e.target.closest('[data-page]');if(seg){e.preventDefault();e.stopPropagation();selectPage(+seg.dataset.page);}}};
 $('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);$('play').onclick=togglePlay;
-function renderDialog(){const s=scenes[index];$('dialogTitle').textContent=`${index+1} / ${N} · ${s.title}`;$('zoomedSlide').src=ORIGINALS[s.originalIndex];$('zoomedSlide').alt=s.title;$('dialogPrev').disabled=index===0;$('dialogNext').disabled=index===N-1;}
-function enlarge(){if(scenes[index].video)return;playing=false;mode='manual';render();$('sourceDialog').showModal();renderDialog();$('sourceZoom').value=100;setZoom();updateSpinControls();}
+function renderDialog(){const s=scenes[index];$('dialogTitle').textContent=`${index} / ${N-1} · ${s.title}`;$('zoomedSlide').src=ORIGINALS[s.originalIndex];$('zoomedSlide').alt=s.title;$('dialogPrev').disabled=index===0;$('dialogNext').disabled=index===N-1;}
+function enlarge(){if(scenes[index].video||scenes[index].cover)return;playing=false;mode='manual';render();$('sourceDialog').showModal();renderDialog();$('sourceZoom').value=100;setZoom();updateSpinControls();}
 function setZoom(){const n=+$('sourceZoom').value;$('zoomedSlide').style.width=n+'%';$('zoomValue').textContent=n+'%';}
 $('enlargeSource').onclick=enlarge;$('dialogClose').onclick=()=>$('sourceDialog').close();$('sourceZoom').oninput=setZoom;$('dialogPrev').onclick=()=>step(-1);$('dialogNext').onclick=()=>step(1);$('sourceDialog').addEventListener('close',()=>{last=performance.now();});
 async function full(toggle=false){try{if(document.fullscreenElement){if(toggle)await document.exitFullscreen();}else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else throw Error('Fullscreen unsupported');}catch(e){$('fullscreenEntry').hidden=false;}}
@@ -1086,7 +1099,7 @@ document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].include
  if(e.code==='Space'&&!$('sourceDialog').open){if(document.activeElement.tagName==='BUTTON')return;e.preventDefault();togglePlay();}else if(e.key==='ArrowRight'){e.preventDefault();step(1);}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1);}else if(e.key.toLowerCase()==='f'&&!$('sourceDialog').open)full(true);});
 document.addEventListener('visibilitychange',()=>{last=performance.now();syncMedia();});
 setInterval(()=>{const now=performance.now(),dt=(now-last)/1000;last=now;if(!playing||mode!=='loop'||document.hidden||$('sourceDialog').open)return;if(video){elapsed=video.currentTime;updateProgress();return;}elapsed+=Math.min(dt,1);if(elapsed>=scenes[index].duration)step(1);else updateProgress();},100);
-window.ExhibitDemo={seek(t){mode='loop';playing=false;t=((t%total())+total())%total();index=0;while(index<N-1&&t>=scenes[index].duration){t-=scenes[index++].duration;}elapsed=t;renderedIndex=-1;render();},state(){return{mode,index,elapsed,playing,total:total(),sourcePages:N,originalPages:originalScenes.length,sourcePage:scenes[index].srcPage,video:scenes[index].video||null,rotation:arch3D?.state()||{ready:false}};},previewRotation(a){arch3D?.previewRotation(a);},render3DFrame(t,a){arch3D?.seekFrame(t,a);},get durations(){return scenes.map(s=>s.duration);}};
+window.ExhibitDemo={seek(t){mode='loop';playing=false;t=((t%total())+total())%total();index=0;while(index<N-1&&t>=scenes[index].duration){t-=scenes[index++].duration;}elapsed=t;renderedIndex=-1;render();},state(){return{mode,index,elapsed,playing,total:total(),sourcePages:N,cover:!!scenes[index].cover,title:scenes[index].title,contentPage:scenes[index].cover?null:index,originalPages:originalScenes.length,sourcePage:scenes[index].srcPage,video:scenes[index].video||null,rotation:arch3D?.state()||{ready:false}};},previewRotation(a){arch3D?.previewRotation(a);},render3DFrame(t,a){arch3D?.seekFrame(t,a);},get durations(){return scenes.map(s=>s.duration);}};
 const params=new URLSearchParams(location.search);if(params.has('t'))window.ExhibitDemo.seek(Number(params.get('t'))||0);else render();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initFullscreen,{once:true});else initFullscreen();
 
