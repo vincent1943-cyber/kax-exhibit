@@ -399,8 +399,8 @@ window.__PAGES=[
    {t:'合规感知调度引擎', lines:['硬约束：数据不出域、临床优先、设备兼容和故障域','评分：SLA、队列时间、碎片率、跨域带宽与成本','动作：Gang、Backfill、抢占、迁移和重新调度']},
    {t:'双机房编排与站点自治', d:'Kubernetes Federation、Local Policy Cache、Lease 与 Autoscaler'}]},
   {h:'执行面与资源池', note:'绑定 · 扩缩容 · 故障切换 · 重启', kind:'cards', cols:3, items:[
-   {t:'主机房 A · 华为 Ascend 910B', lines:['临床生产池；Cluster Agent、NPU Operator、Device Plugin','HCCS 或 RoCE、NPU Health、Gang Binding']},
-   {t:'容灾机房 B · NVIDIA A800', lines:['临床推理备用池；NVIDIA Device Plugin、MIG 与 vGPU','NVLink 或 RoCE、DCGM、Topology Aware Placement']},
+   {t:'院内算力池 · 华为 Ascend 910B', lines:['临床生产池；Cluster Agent、NPU Operator、Device Plugin','HCCS 或 RoCE、NPU Health、Gang Binding']},
+   {t:'院外算力池（模型训练） · NVIDIA A800', lines:['模型训练池；NVIDIA Device Plugin、MIG 与 vGPU','NVLink 或 RoCE、DCGM、Topology Aware Placement']},
    {t:'科研隔离区 · 混合与虚拟化资源', lines:['专属 GPU 或 NPU、vGPU 分片、配额、时间片与弹性回收','脱敏数据留在批准区域内执行']}]}
  ]
 },
@@ -798,7 +798,7 @@ const profiles=[
  [['语义模型','对象 / 关系 / 规则'],['源系统','HIS / LIS / PACS'],['数据加工','清洗 / 整合 / 质检'],['语义映射','对象 / 属性 / 关系'],['实例激活','新增 / 更新 / 事件'],['动态数字孪生','来源 / 版本 / 质量']],
  [['应用定义','目标 / 角色 / 契约'],['本体与数据融合','映射 / 质检 / 实例化'],['GUI / LUI','低代码 / 对话开发'],['能力装配','Skill / Tool / Knowledge'],['调试与评测','规划 / 上下文 / 工具'],['生产生命周期','版本 / CI/CD / RBAC']],
  [['Agent 控制面','身份 / 策略 / 资源'],['Runtime Scheduler','扩缩容 / 会话隔离'],['Runtime Pod','LLM / Skill / Tool'],['Agent Gateway','LLM / MCP / CLI'],['知识与状态','RAG / 本体 / 记忆'],['VM / micro-VM','高风险工具隔离池']],
- [['医院身份与准入','RBAC / ABAC'],['合规感知调度','数据域 / 优先级 / SLA'],['双机房编排','站点自治 / 扩缩容'],['Ascend 910B','主机房 · 临床生产池'],['NVIDIA A800','容灾池 · MIG / vGPU'],['科研隔离区','混合资源 / 弹性回收']],
+ [['医院身份与准入','RBAC / ABAC'],['合规感知调度','数据域 / 优先级 / SLA'],['双机房编排','站点自治 / 扩缩容'],['Ascend 910B','院内算力池 · 临床生产'],['NVIDIA A800','院外算力池 · 模型训练'],['科研隔离区','混合资源 / 弹性回收']],
  [['医疗集成网关','HL7 / FHIR / DICOMweb'],['安全模型网关','认证 / 配额 / 检查'],['动态路由','风险 / SLA / 复核'],['推理与 RAG','模型 / 知识 / 策略'],['安全输出','PHI / 结构化校验'],['审计与计量','质量 / 用量 / 告警']],
  [['企业身份源','SSO / LDAP / AD'],['Agent ID Guard','用户 / 组织 / Agent'],['Token Service','短期令牌 / 交换 / 吊销'],['上下文与记忆','压缩 / 召回 / 恢复'],['三层可观测','应用 / 服务 / 基础设施'],['统一 Trace','结果 / 模型 / 资源']],
  [['任务协调智能体','理解目标 / 拆解 / 跟踪'],['数据专家','查数与口径核对'],['写作专家','分析与报告撰写'],['PPT 专家','结构与版式制作'],['组织级业务','数字专家服务全院'],['AI 中台','模型 / 知识 / 权限']],
