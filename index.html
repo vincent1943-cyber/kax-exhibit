@@ -98,11 +98,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .arch-current .ac-tag{font-family:var(--mono);font-size:calc(var(--u)*10.5);letter-spacing:.35em;color:var(--faint)}
 #archCurrentTitle{font-size:calc(var(--u)*26);font-weight:800;letter-spacing:.08em;margin:calc(var(--u)*2) 0;color:var(--accent);text-shadow:0 0 calc(var(--u)*18) color-mix(in srgb,var(--accent) 60%, transparent);transition:color .5s}
 #archCurrentDescription{font-size:calc(var(--u)*13.5);color:var(--dim);letter-spacing:.05em}
-.arch-motion-controls{display:flex;align-items:center;gap:calc(var(--u)*10);margin-top:calc(var(--u)*10)}
+.arch-motion-controls{display:flex;flex-wrap:wrap;align-items:center;gap:calc(var(--u)*10);margin-top:calc(var(--u)*10)}
 .holo-btn{padding:calc(var(--u)*7) calc(var(--u)*16);font-size:calc(var(--u)*13);letter-spacing:.14em;color:#bfe9ff;background:rgba(0,110,170,.16);border:calc(var(--u)*1) solid rgba(0,200,255,.35);border-radius:calc(var(--u)*3);transition:all .25s;position:relative}
 .holo-btn:hover:not(:disabled){background:rgba(0,200,255,.22);color:#fff;box-shadow:0 0 calc(var(--u)*14) rgba(0,232,255,.4)}
 .holo-btn:disabled{opacity:.35;cursor:default}
-#archSpinStatus{font-size:calc(var(--u)*11.5);color:var(--faint);letter-spacing:.08em;margin-left:auto}
+#archSpinStatus{flex-basis:100%;font-size:calc(var(--u)*11.5);color:var(--faint);letter-spacing:.08em;margin-left:0}
 
 /* ---- 右侧内容 ---- */
 .detail{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
@@ -307,6 +307,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     <div class="arch-motion-controls">
      <button type="button" class="holo-btn" id="archSpinToggle">暂停自转</button>
      <button type="button" class="holo-btn" id="archResetView">复位视角</button>
+     <button type="button" class="holo-btn" id="archPlaybackToggle" aria-controls="timeline pageBody">暂停播放</button>
      <span id="archSpinStatus"></span>
     </div>
    </div>
@@ -1049,7 +1050,7 @@ function updateSpinControls(){const stt=arch3D?.state();$('archSpinToggle').disa
 function selectPage(i){index=Math.max(0,Math.min(N-1,i));mode='loop';playing=true;elapsed=0;renderedIndex=-1;last=performance.now();render();}
 arch3D=window.createArchitecture3D(root.querySelector('.architecture-visual'),{isPlaying:()=>!document.hidden,onSelect(layer){selectPage(layerTargets[layer]??0)},onMotion:updateSpinControls});
 root.querySelectorAll('.arch3d-label').forEach(b=>b.onclick=()=>selectPage(layerTargets[b.dataset.layer]??0));
-$('archSpinToggle').onclick=()=>arch3D?.toggle();$('archResetView').onclick=()=>arch3D?.reset();
+$('archSpinToggle').onclick=()=>arch3D?.toggle();$('archResetView').onclick=()=>arch3D?.reset();$('archPlaybackToggle').onclick=togglePlay;
 function updateProgress(){const pos=offset(index)+elapsed;$('status').textContent=`${clock(pos)} / ${clock(total())}`;
  tlSegs.forEach((seg,i)=>{seg.classList.toggle('done',i<index);seg.classList.toggle('now',i===index);seg.setAttribute('aria-current',i===index?'step':'false');seg.querySelector('.fill').style.width=i<index?'100%':i===index?Math.min(100,elapsed/scenes[index].duration*100)+'%':'0'});}
 function syncMedia(){
@@ -1073,6 +1074,7 @@ function mountVideo(s){
  $('videoSound').onclick=()=>{soundOn=!soundOn;target.muted=!soundOn;updateStateControls();};
 }
 function updateStateControls(){
+ $('archPlaybackToggle').textContent=playing?'暂停播放':'恢复播放';
  $('loopMode').classList.toggle('on',mode==='loop');$('demoMode').classList.toggle('on',mode==='manual');$('play').textContent=playing?'暂停':'播放';$('prev').disabled=mode==='manual'&&index===0;$('next').disabled=mode==='manual'&&index===N-1;
  if(video){$('videoPause').textContent=playing?'暂停':'播放';$('videoSound').textContent=soundOn?'关闭声音':'开启声音';}
  updateSpinControls();
